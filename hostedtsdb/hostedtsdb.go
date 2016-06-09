@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	name                 = "grafana-hostedtsdb"
+	name                 = "grafananet-tsdb"
 	version              = 1
 	pluginType           = plugin.PublisherPluginType
 	maxMetricsPerPayload = 3000
