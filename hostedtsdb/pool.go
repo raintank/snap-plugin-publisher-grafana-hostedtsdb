@@ -104,17 +104,17 @@ func (t *Tsdb) Flush() {
 	t.Metrics = t.Metrics[:0]
 	t.Unlock()
 	// Write the metrics to our HTTP server.
-	logger.LogDebug("writing %d metrics to API", len(metrics))
+	logger.LogDebug("writing metrics to API", "count", len(metrics))
 	id := t.LastFlush.UnixNano()
 	body, err := msg.CreateMsg(metrics, id, msg.FormatMetricDataArrayMsgp)
 	if err != nil {
-		logger.LogError("Error: unable to convert metrics to MetricDataArrayMsgp. %s", err)
+		logger.LogError("unable to convert metrics to MetricDataArrayMsgp.", "error", err)
 		return
 	}
 	sent := false
 	for !sent {
 		if err = t.PostData("metrics", body); err != nil {
-			logger.LogError("Error: %s", err)
+			logger.LogError(err.Error())
 			time.Sleep(time.Second)
 		} else {
 			sent = true
@@ -183,13 +183,13 @@ func sendEvent(tsdb *Tsdb, orgId int, m *plugin.MetricType) {
 
 	body, err := msg.CreateProbeEventMsg(event, id, msg.FormatProbeEventMsgp)
 	if err != nil {
-		logger.LogError("Unable to convert event to ProbeEventMsgp. %s", err)
+		logger.LogError("Unable to convert event to ProbeEventMsgp.", "error", err)
 		return
 	}
 	sent := false
 	for !sent {
 		if err = tsdb.PostData("events", body); err != nil {
-			logger.LogError("Error: %s", err)
+			logger.LogError(err.Error())
 			time.Sleep(time.Second)
 		} else {
 			sent = true

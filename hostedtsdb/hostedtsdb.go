@@ -73,15 +73,13 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 	case plugin.SnapGOBContentType:
 		dec := gob.NewDecoder(bytes.NewBuffer(content))
 		if err := dec.Decode(&metrics); err != nil {
-			logger.LogError("Error decoding: error=%v content=%v", err, content)
+			logger.LogError(err.Error(), "content", content)
 			return err
 		}
 	default:
-		logger.LogError("Error unknown content type '%v'", contentType)
+		logger.LogError("unknown content type", "contentType", contentType)
 		return errors.New(fmt.Sprintf("Unknown content type '%s'", contentType))
 	}
-
-	logger.LogDebug("publishing %v metrics to %v", len(metrics), config)
 
 	remote := config["tsdbUrl"].(ctypes.ConfigValueStr).Value
 	if remote == "" {
@@ -92,9 +90,11 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 	}
 	remoteUrl, err := url.Parse(remote)
 	if err != nil {
-		logger.LogError("Invalid TSDB URL %s", remote, err)
+		logger.LogError("Invalid TSDB URL", "error", err)
 		return err
 	}
+
+	logger.LogDebug("publishing metrics to %s, count %d", remote, len(metrics))
 
 	apiKey := config["apiKey"].(ctypes.ConfigValueStr).Value
 	interval := config["interval"].(ctypes.ConfigValueInt).Value
