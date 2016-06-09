@@ -50,8 +50,8 @@ func init() {
 
 func (f *HostedtsdbPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 	c := cpolicy.New()
-	rule, _ := cpolicy.NewStringRule("tsdb_url", false, "https://tsdb.raintank.io/")
-	rule2, _ := cpolicy.NewStringRule("api_key", true)
+	rule, _ := cpolicy.NewStringRule("tsdbUrl", false, "https://tsdb.raintank.io/")
+	rule2, _ := cpolicy.NewStringRule("apiKey", true)
 	rule3, _ := cpolicy.NewIntegerRule("interval", true)
 	rule4, _ := cpolicy.NewIntegerRule("orgId", false, 0)
 	rule5, _ := cpolicy.NewStringRule("prefix", false, "")
