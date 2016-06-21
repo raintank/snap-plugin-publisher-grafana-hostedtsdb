@@ -108,6 +108,9 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 		var value float64
 		rawData := m.Data()
 		switch rawData.(type) {
+		case nil:
+			// there is no data to send.
+			continue
 		case string:
 			//payload is an event.
 			go sendEvent(tsdb, orgId, &m)
@@ -134,8 +137,14 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 			value = float64(rawData.(float32))
 		case float64:
 			value = rawData.(float64)
+		case bool:
+			if rawData.(bool) {
+				value = 1
+			} else {
+				value = 0
+			}
 		default:
-			return errors.New("unknown data type")
+			return errors.New(fmt.Sprintf("unknown data type: %T", rawData))
 		}
 
 		tags := make([]string, 0)
