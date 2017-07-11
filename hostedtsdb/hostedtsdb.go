@@ -12,7 +12,7 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
-	"github.com/raintank/raintank-metric/schema"
+	"gopkg.in/raintank/schema.v1"
 )
 
 const (
@@ -152,7 +152,7 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 		unit := ""
 		for k, v := range m.Tags() {
 			switch k {
-			case "targetType":
+			case "targetType", "mtype":
 				targetType = v
 			case "unit":
 				unit = v
@@ -163,20 +163,20 @@ func (f *HostedtsdbPublisher) Publish(contentType string, content []byte, config
 
 		var name string
 		if prefix != "" {
-			name = fmt.Sprintf("%s.%s", prefix, m.Namespace().Key())
+			name = fmt.Sprintf("%s.%s", prefix, strings.Join(m.Namespace().Strings(), "."))
 		} else {
-			name = m.Namespace().Key()
+			name = strings.Join(m.Namespace().Strings(), ".")
 		}
 
 		metric := &schema.MetricData{
-			OrgId:      orgId,
-			Name:       name,
-			Interval:   interval,
-			Value:      value,
-			Time:       m.Timestamp().Unix(),
-			TargetType: targetType,
-			Unit:       unit,
-			Tags:       tags,
+			OrgId:    orgId,
+			Name:     name,
+			Interval: interval,
+			Value:    value,
+			Time:     m.Timestamp().Unix(),
+			Mtype:    targetType,
+			Unit:     unit,
+			Tags:     tags,
 		}
 		metric.SetId()
 		metricsArray[i] = metric
